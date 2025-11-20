@@ -1,5 +1,6 @@
 #include <enet/enet.h>
 #include <iostream>
+#include <cstring>
 
 int main(int argc, char** argv) {
     if (enet_initialize() != 0) {

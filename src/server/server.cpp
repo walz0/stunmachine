@@ -66,7 +66,7 @@ int main(int argc, char** argv)
 
     ENetAddress address;
     address.host = ENET_HOST_ANY;
-    address.port = 3478; // STUN default port
+    address.port = 1738;
 
     ENetHost* server = enet_host_create(&address, 32, 1, 0, 0);
     if (!server) {

@@ -1,4 +1,4 @@
-C:/Users/walz0/stunmachine/CMakeFiles/client.dir
-C:/Users/walz0/stunmachine/CMakeFiles/server.dir
-C:/Users/walz0/stunmachine/CMakeFiles/ALL_BUILD.dir
-C:/Users/walz0/stunmachine/CMakeFiles/ZERO_CHECK.dir
+/home/walz/stunmachine/CMakeFiles/client.dir
+/home/walz/stunmachine/CMakeFiles/server.dir
+/home/walz/stunmachine/CMakeFiles/edit_cache.dir
+/home/walz/stunmachine/CMakeFiles/rebuild_cache.dir
