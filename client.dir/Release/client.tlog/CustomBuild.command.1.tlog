@@ -1,0 +1,10 @@
+^C:\USERS\WALZ0\STUNMACHINE\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/walz0/stunmachine -BC:/Users/walz0/stunmachine --check-stamp-file C:/Users/walz0/stunmachine/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

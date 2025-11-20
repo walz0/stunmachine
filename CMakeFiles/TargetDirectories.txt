@@ -1,3 +1,4 @@
-C:/Users/walz0/stunmachine/CMakeFiles/stunmachine.dir
+C:/Users/walz0/stunmachine/CMakeFiles/client.dir
+C:/Users/walz0/stunmachine/CMakeFiles/server.dir
 C:/Users/walz0/stunmachine/CMakeFiles/ALL_BUILD.dir
 C:/Users/walz0/stunmachine/CMakeFiles/ZERO_CHECK.dir
