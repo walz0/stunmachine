@@ -15,8 +15,12 @@ set_target_properties(enet PROPERTIES
     IMPORTED_LOCATION "${ENET_DIR}/lib/enet.lib"
 )
 
-# Your executable
-add_executable(stunmachine main.cpp)
+# Add your source files from the src folder
+file(GLOB_RECURSE SOURCES
+    "${CMAKE_SOURCE_DIR}/src/*.cpp"
+)
+
+add_executable(stunmachine ${SOURCES})
 
 # Link ENet + required Windows libs
 target_link_libraries(stunmachine PRIVATE
