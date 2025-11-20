@@ -14,8 +14,10 @@ if (WIN32)
         IMPORTED_LOCATION "${ENET_DIR}/lib/enet.lib"
     )
 else()
-    # Linux: assume ENet is installed system-wide (sudo apt install libenet-dev)
-    find_package(ENet REQUIRED)
+	# Linux: system ENet installation
+    include_directories("/usr/include")
+    # The actual lib file
+    set(ENET_LIB "/usr/lib/x86_64-linux-gnu/libenet.so")
 endif()
 
 # ===== CLIENT =====
