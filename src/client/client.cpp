@@ -23,8 +23,8 @@ int main(int argc, char** argv) {
     }
 
     ENetAddress address;
-    enet_address_set_host(&address, "127.0.0.1");
-    address.port = 3478;
+    enet_address_set_host(&address, "31.220.109.234");
+    address.port = 1738;
 
     // Attempt to connect
     ENetPeer* peer = enet_host_connect(client, &address, 2, 0);

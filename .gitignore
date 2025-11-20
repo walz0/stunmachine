@@ -1,0 +1,41 @@
+# --- Build directories ---
+/build/
+/Debug/
+/Release/
+/x64/
+/CMakeFiles/
+/*.dir/
+
+# Individual generated dirs
+/client.dir/
+/server.dir/
+/stunmachine.dir/
+
+# --- CMake generated files ---
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# VS/MSBuild generated files
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+ALL_BUILD.vcxproj
+ZERO_CHECK.vcxproj
+
+# Executables / binaries
+/client
+/server
+/stunmachine
+*.exe
+*.obj
+*.pdb
+*.lib
+*.dll
+
+# OS / tool clutter
+*.log
+*.tmp
+*.cache
+
