@@ -34,7 +34,6 @@ if (WIN32)
 	add_executable(client src/client/client.cpp)
     target_link_libraries(client PRIVATE enet ws2_32 winmm)
 else()
-    target_link_libraries(client PRIVATE enet)   # Linux
 endif()
 
 # ===== SERVER =====
