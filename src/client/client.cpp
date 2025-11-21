@@ -2,8 +2,15 @@
 #include <iostream>
 #include <cstring>
 #include <cstdint>
-#include <winsock2.h>  // for htons, htonl on Windows
 #include <random>
+
+#ifdef _WIN32
+    #include <winsock2.h>
+#else
+    #include <arpa/inet.h>   // for htons, ntohs, htonl, ntohl
+    #include <netinet/in.h>
+    #include <sys/socket.h>
+#endif
 
 // STUN message types
 constexpr uint16_t STUN_BINDING_REQUEST = 0x0001;
@@ -116,7 +123,8 @@ int main(int argc, char** argv) {
                         }
                         std::cout << "\n";
                     } else {
-                        std::cout << "Received non-STUN or unexpected message\n";
+                        // std::cout << "Received non-STUN or unexpected message\n";
+						std::cout << event.packet->data << std::endl;
                     }
                 }
                 

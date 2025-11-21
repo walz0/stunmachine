@@ -84,8 +84,6 @@ int main(int argc, char** argv)
                 enet_packet_destroy(event.packet);
 
 				const char* msg = "Hello World";
-				//uint8_t buffer[sizeof("Hello World")] = {};
-
 				ENetPacket* out = enet_packet_create(
 					msg,
 					sizeof(StunHeader),
