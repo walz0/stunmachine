@@ -31,13 +31,13 @@ endif()
 
 # ===== CLIENT =====
 if (WIN32)
-	add_executable(client src/client/client.cpp)
+	add_executable(client src/client.cpp)
     target_link_libraries(client PRIVATE enet ws2_32 winmm)
 else()
 endif()
 
 # ===== SERVER =====
-add_executable(server src/server/server.cpp)
+add_executable(server src/server.cpp)
 
 if (WIN32)
     target_link_libraries(server PRIVATE enet ws2_32 winmm)

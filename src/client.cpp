@@ -57,7 +57,8 @@ int main(int argc, char** argv) {
     }
 
     ENetAddress address;
-    enet_address_set_host(&address, "31.220.109.234");
+    // enet_address_set_host(&address, "31.220.109.234");
+    enet_address_set_host(&address, "127.0.0.1");
     address.port = 1738;
 
     // Attempt to connect
@@ -108,7 +109,7 @@ int main(int argc, char** argv) {
     while (enet_host_service(client, &event, timeout_ms) > 0) {
         switch (event.type) {
             case ENET_EVENT_TYPE_RECEIVE: {
-                std::cout << "Received packet of " << event.packet->dataLength << " bytes\n";
+				printf("%s\n", event.packet->data);
                 
                 if (event.packet->dataLength >= sizeof(StunHeader)) {
                     StunHeader* resp = reinterpret_cast<StunHeader*>(event.packet->data);

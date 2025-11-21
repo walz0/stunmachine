@@ -2,6 +2,7 @@
 #include <enet/enet.h>
 #include <cstdint>
 #include <cstring>
+#include <vector>
 
 // STUN message types
 constexpr uint16_t STUN_BINDING_REQUEST  = 0x0001;
@@ -19,12 +20,33 @@ struct StunHeader {
 };
 #pragma pack(pop)
 
-int user_count = 0;
+std::vector<ENetPeer*> clients;
 
-void handle_packet(ENetPeer* peer, ENetPacket* packet)
+void share_peer_info()
 {
-    if (packet->dataLength < sizeof(StunHeader)) {
-        return; // not STUN
+	int num_clients = clients.size();
+	for (int peer_idx = 0; peer_idx < num_clients; peer_idx++)
+	{
+		// Send a message to all peers for each peer
+		ENetPeer* curr_peer = clients[peer_idx];
+
+		char buffer[25];
+		sprintf(buffer, "Hello! Client: %i", peer_idx);
+
+		ENetPacket* out = enet_packet_create(
+			&buffer,
+			strlen((const char*)&buffer) + 1,
+			ENET_PACKET_FLAG_UNSEQUENCED
+		);
+		enet_peer_send(curr_peer, 0, out);
+	}
+}
+
+bool handle_packet(ENetPeer* peer, ENetPacket* packet)
+{
+    if (packet->dataLength < sizeof(StunHeader)) 
+	{
+        return false; // not STUN
     }
 
     StunHeader* req = reinterpret_cast<StunHeader*>(packet->data);
@@ -33,13 +55,17 @@ void handle_packet(ENetPeer* peer, ENetPacket* packet)
     uint32_t magic   = ntohl(req->magic);
 
     if (magic != STUN_MAGIC_COOKIE)
-        return; // Not a STUN message
+	{
+        return false; // Not a STUN message
+	}
 
     if (msgType != STUN_BINDING_REQUEST)
-        return; // Not a Binding Request
+	{
+        return false; // Not a Binding Request
+	}
 
-	user_count++;
-	printf("Total connections: %i", user_count);
+	// Save pointer to connected peer
+	clients.push_back(peer);
 
     // --- Build the STUN Binding Success Response ---
     uint8_t buffer[sizeof(StunHeader)] = {};
@@ -60,6 +86,7 @@ void handle_packet(ENetPeer* peer, ENetPacket* packet)
     );
 
     enet_peer_send(peer, 0, out);
+	return true;
 }
 
 int main(int argc, char** argv)
@@ -85,14 +112,16 @@ int main(int argc, char** argv)
             switch (event.type) {
             case ENET_EVENT_TYPE_RECEIVE:
 			{
-                handle_packet(event.peer, event.packet);
+                if (handle_packet(event.peer, event.packet))
+				{
+					const uint8_t client_idx = clients.size() - 1;
+					char ip[16];
+					enet_address_get_host_ip(&event.peer->address, ip, sizeof(ip));
+					printf("Client %i connected. %s:%u\n", client_idx, ip, event.peer->address.port);
+					share_peer_info();
+				}
                 enet_packet_destroy(event.packet);
-
-				char ip[16];
-				// Get connected user's ip
-				enet_address_get_host_ip(&event.peer->address, ip, sizeof(ip));
-				printf("%s:%u\n", ip, event.peer->address.port);
-
+				/*
 				const char* msg = "Hello World";
 				ENetPacket* out = enet_packet_create(
 					msg,
@@ -100,6 +129,7 @@ int main(int argc, char** argv)
 					ENET_PACKET_FLAG_UNSEQUENCED
 				);
 				enet_peer_send(event.peer, 0, out);
+				*/
 			}
 			break;
             default:
