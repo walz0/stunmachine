@@ -19,6 +19,8 @@ struct StunHeader {
 };
 #pragma pack(pop)
 
+int user_count = 0;
+
 void handle_packet(ENetPeer* peer, ENetPacket* packet)
 {
     if (packet->dataLength < sizeof(StunHeader)) {
@@ -35,6 +37,9 @@ void handle_packet(ENetPeer* peer, ENetPacket* packet)
 
     if (msgType != STUN_BINDING_REQUEST)
         return; // Not a Binding Request
+
+	user_count++;
+	printf("Total connections: %i", user_count);
 
     // --- Build the STUN Binding Success Response ---
     uint8_t buffer[sizeof(StunHeader)] = {};
