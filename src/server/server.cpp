@@ -83,6 +83,15 @@ int main(int argc, char** argv)
                 handle_packet(event.peer, event.packet);
                 enet_packet_destroy(event.packet);
 
+				uint32_t addr_raw = event.peer->address.host;
+				uint8_t ip[4] = {
+					addr_raw << 0,
+					addr_raw << 8,
+					addr_raw << 16,
+					addr_raw << 32 
+				};
+				printf("%u:%u:%u:%u", ip[0], ip[1], ip[2], ip[4]);
+
 				const char* msg = "Hello World";
 				ENetPacket* out = enet_packet_create(
 					msg,
