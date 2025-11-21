@@ -77,14 +77,25 @@ int main(int argc, char** argv)
     while (true) {
         ENetEvent event;
         while (enet_host_service(server, &event, 10) > 0) {
-
             switch (event.type) {
             case ENET_EVENT_TYPE_RECEIVE:
+			{
                 handle_packet(event.peer, event.packet);
                 enet_packet_destroy(event.packet);
-                break;
+
+				const char* msg = "Hello World";
+				//uint8_t buffer[sizeof("Hello World")] = {};
+
+				ENetPacket* out = enet_packet_create(
+					msg,
+					sizeof(StunHeader),
+					ENET_PACKET_FLAG_UNSEQUENCED
+				);
+				enet_peer_send(event.peer, 0, out);
+			}
+			break;
             default:
-                break;
+			break;
             }
         }
     }

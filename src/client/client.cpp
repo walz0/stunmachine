@@ -97,7 +97,8 @@ int main(int argc, char** argv) {
 
     // Listen for a reply for up to 3 seconds
     bool received = false;
-    while (enet_host_service(client, &event, 3000) > 0) {
+	int32_t timeout_ms = 30000;
+    while (enet_host_service(client, &event, timeout_ms) > 0) {
         switch (event.type) {
             case ENET_EVENT_TYPE_RECEIVE: {
                 std::cout << "Received packet of " << event.packet->dataLength << " bytes\n";

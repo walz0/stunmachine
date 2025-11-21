@@ -1,0 +1,14 @@
+[
+{
+  "directory": "C:/Users/walz0/stunmachine/build",
+  "command": "C:\\ProgramData\\mingw64\\mingw64\\bin\\g++.exe  -IC:\\PROGRA~2\\enet\\include -std=gnu++17 -o CMakeFiles\\client.dir\\src\\client\\client.cpp.obj -c C:\\Users\\walz0\\stunmachine\\src\\client\\client.cpp",
+  "file": "C:/Users/walz0/stunmachine/src/client/client.cpp",
+  "output": "CMakeFiles/client.dir/src/client/client.cpp.obj"
+},
+{
+  "directory": "C:/Users/walz0/stunmachine/build",
+  "command": "C:\\ProgramData\\mingw64\\mingw64\\bin\\g++.exe  -IC:\\PROGRA~2\\enet\\include -std=gnu++17 -o CMakeFiles\\server.dir\\src\\server\\server.cpp.obj -c C:\\Users\\walz0\\stunmachine\\src\\server\\server.cpp",
+  "file": "C:/Users/walz0/stunmachine/src/server/server.cpp",
+  "output": "CMakeFiles/server.dir/src/server/server.cpp.obj"
+}
+]
