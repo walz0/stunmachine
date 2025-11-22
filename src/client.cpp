@@ -12,6 +12,9 @@
     #include <sys/socket.h>
 #endif
 
+constexpr uint16_t STUN_SERVER_PORT = 1738;
+constexpr char* STUN_SERVER_ADDR = "127.0.0.1";
+
 // STUN message types
 constexpr uint16_t STUN_BINDING_REQUEST = 0x0001;
 constexpr uint16_t STUN_BINDING_SUCCESS = 0x0101;
@@ -36,6 +39,27 @@ void generate_transaction_id(uint8_t* id) {
     }
 }
 
+ENetPacket* handle_stun_packet(ENetPacket* packet)
+{
+	if (packet->dataLength >= sizeof(StunHeader)) 
+	{
+		StunHeader* resp = reinterpret_cast<StunHeader*>(packet->data);
+		uint16_t msgType = ntohs(resp->type);
+		uint32_t magic = ntohl(resp->magic);
+		
+		if (magic == STUN_MAGIC_COOKIE && msgType == STUN_BINDING_SUCCESS) 
+		{
+			return packet;
+		} 
+	}
+	return nullptr;
+}
+
+StunHeader* get_stun_header(ENetPacket* packet)
+{
+	return reinterpret_cast<StunHeader*>(packet->data);
+}
+
 int main(int argc, char** argv) {
     if (enet_initialize() != 0) {
         std::cerr << "Failed to initialize ENet.\n";
@@ -58,8 +82,8 @@ int main(int argc, char** argv) {
 
     ENetAddress address;
     // enet_address_set_host(&address, "31.220.109.234");
-    enet_address_set_host(&address, "127.0.0.1");
-    address.port = 1738;
+    enet_address_set_host(&address, STUN_SERVER_ADDR);
+    address.port = STUN_SERVER_PORT;
 
     // Attempt to connect
     ENetPeer* peer = enet_host_connect(client, &address, 2, 0);
@@ -72,8 +96,7 @@ int main(int argc, char** argv) {
 
     // Wait up to 5 seconds for the server to respond
     ENetEvent event;
-    if (enet_host_service(client, &event, 5000) > 0 &&
-        event.type == ENET_EVENT_TYPE_CONNECT)
+    if (enet_host_service(client, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_CONNECT)
     {
         std::cout << "Connected to server!\n";
         
@@ -103,41 +126,45 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    // Listen for a reply for up to 3 seconds
     bool received = false;
 	int32_t timeout_ms = 30000;
-    while (enet_host_service(client, &event, timeout_ms) > 0) {
-        switch (event.type) {
-            case ENET_EVENT_TYPE_RECEIVE: {
-				printf("%s\n", event.packet->data);
-                
-                if (event.packet->dataLength >= sizeof(StunHeader)) {
-                    StunHeader* resp = reinterpret_cast<StunHeader*>(event.packet->data);
-                    uint16_t msgType = ntohs(resp->type);
-                    uint32_t magic = ntohl(resp->magic);
-                    
-                    if (magic == STUN_MAGIC_COOKIE && msgType == STUN_BINDING_SUCCESS) {
-                        std::cout << "✓ Received valid STUN Binding Success Response!\n";
-                        std::cout << "  Transaction ID: ";
-                        for (int i = 0; i < 12; ++i) {
-                            printf("%02x", resp->transactionId[i]);
-                        }
-                        std::cout << "\n";
-                    } else {
-                        // std::cout << "Received non-STUN or unexpected message\n";
-						std::cout << event.packet->data << std::endl;
-                    }
-                }
-                
+    while (enet_host_service(client, &event, timeout_ms) > 0) 
+	{
+        switch (event.type) 
+		{
+            case ENET_EVENT_TYPE_RECEIVE: 
+			{
+				// Handle STUN messages
+				if (ENetPacket* stun_packet = handle_stun_packet(event.packet))
+				{
+					// Print STUN header
+					StunHeader* header = get_stun_header(stun_packet);
+					printf("\nReceived STUN Message:\n");
+					printf("Type: %i\n", header->type);
+					printf("Length: %i\n", header->length);
+					printf("Magic Cookie: %08x\n", header->magic);
+					printf("Transaction ID: ");
+					for (int i = 0; i < 12; i++)
+					{
+						printf("%02x", header->transactionId[i]);
+					}
+					printf("\n");
+				}
+				else 
+				{
+					printf("\nReceived Message:\n");
+					printf("%s\n", event.packet->data);
+				}
+
                 enet_packet_destroy(event.packet);
                 received = true;
-                break;
             }
+			break;
             case ENET_EVENT_TYPE_DISCONNECT:
                 std::cout << "Disconnected.\n";
-                break;
+			break;
             default:
-                break;
+			break;
         }
         // if (received) break;
     }

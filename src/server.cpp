@@ -22,23 +22,40 @@ struct StunHeader {
 
 std::vector<ENetPeer*> clients;
 
-void share_peer_info()
+void share_peer_info(ENetHost* host)
 {
 	int num_clients = clients.size();
 	for (int peer_idx = 0; peer_idx < num_clients; peer_idx++)
 	{
-		// Send a message to all peers for each peer
-		ENetPeer* curr_peer = clients[peer_idx];
+		for (int dst_idx = 0; dst_idx < num_clients; dst_idx++)
+		{
+			if (peer_idx != dst_idx)
+			{
+				// Send a message containing the src peer info
+				ENetPeer* src_peer = clients[peer_idx];
+				ENetPeer* dst_peer = clients[dst_idx];
 
-		char buffer[25];
-		sprintf(buffer, "Hello! Client: %i", peer_idx);
+				char ip[16];
+				enet_address_get_host_ip(&src_peer->address, ip, sizeof(ip));
 
-		ENetPacket* out = enet_packet_create(
-			&buffer,
-			strlen((const char*)&buffer) + 1,
-			ENET_PACKET_FLAG_UNSEQUENCED
-		);
-		enet_peer_send(curr_peer, 0, out);
+				char buffer[50];
+				sprintf(
+					buffer, 
+					"Client: %i || Peer IP: %s || Peer Port: %u", 
+					peer_idx,
+					ip,
+					src_peer->address.port
+					);
+
+				ENetPacket* out = enet_packet_create(
+					buffer,
+					strlen((const char*)buffer) + 1,
+					ENET_PACKET_FLAG_UNSEQUENCED
+				);
+				enet_peer_send(dst_peer, 0, out);
+			}
+		}
+		enet_host_flush(host);
 	}
 }
 
@@ -82,7 +99,8 @@ bool handle_packet(ENetPeer* peer, ENetPacket* packet)
     ENetPacket* out = enet_packet_create(
         buffer,
         sizeof(StunHeader),
-        ENET_PACKET_FLAG_UNSEQUENCED // STUN is usually UDP-like
+        // ENET_PACKET_FLAG_UNSEQUENCED // STUN is usually UDP-like
+		ENET_PACKET_FLAG_UNSEQUENCED
     );
 
     enet_peer_send(peer, 0, out);
@@ -115,21 +133,14 @@ int main(int argc, char** argv)
                 if (handle_packet(event.peer, event.packet))
 				{
 					const uint8_t client_idx = clients.size() - 1;
-					char ip[16];
-					enet_address_get_host_ip(&event.peer->address, ip, sizeof(ip));
-					printf("Client %i connected. %s:%u\n", client_idx, ip, event.peer->address.port);
-					share_peer_info();
+					int num_clients = clients.size();
+					if (num_clients >= 2)
+					{
+						printf("> 2 Clients connected. Sharing peer info...\n");
+						share_peer_info(server);
+					}
 				}
                 enet_packet_destroy(event.packet);
-				/*
-				const char* msg = "Hello World";
-				ENetPacket* out = enet_packet_create(
-					msg,
-					sizeof(StunHeader),
-					ENET_PACKET_FLAG_UNSEQUENCED
-				);
-				enet_peer_send(event.peer, 0, out);
-				*/
 			}
 			break;
             default:
